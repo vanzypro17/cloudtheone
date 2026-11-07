@@ -339,7 +339,7 @@
 
     }
     else if(response.ok){
-        document.getElementById("message").textContent = day + " gününde olan "+ cname + " adlı ders silindi";
+        document.getElementById("message").textContent = text + " gününde olan "+ cname + " adlı ders silindi";
         classes.splice( Number(class1) , 1);
         drawSchedule(classes);
         drawSelectlist(classes);
