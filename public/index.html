@@ -307,7 +307,23 @@
     console.log(classes[class1]);
 
     let cname = classes[class1]["name"];
-
+    let text = "";
+    if(Number(classes[class1]["day"]) == 0){
+            text = "MONDAY"
+        }
+        else if(Number(classes[class1]["day"]) == 1){
+            text = "TUESDAY"
+        }
+        else if(Number(classes[class1]["day"]) == 2){
+            text = "WEDNESDAY"
+        }
+        else if(Number(classes[class1]["day"]) == 3){
+            text = "THURSDAY"
+        }
+        else if(Number(classes[class1]["day"]) == 4){
+            text = "FRIDAY"
+        }
+    
     const response = await fetch("/deleteclass" , {
         method : "POST" ,
         headers: {"Content-Type" : "application/json"},
@@ -323,7 +339,7 @@
 
     }
     else if(response.ok){
-        document.getElementById("message").textContent = cname + " adlı ders silindi";
+        document.getElementById("message").textContent = day + " gününde olan "+ cname + " adlı ders silindi";
         classes.splice( Number(class1) , 1);
         drawSchedule(classes);
         drawSelectlist(classes);
