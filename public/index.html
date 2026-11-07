@@ -156,6 +156,14 @@
 
    <button id = "addCourse">ADD COURSE</button>
 
+
+
+   <select id = "drop">
+
+   </select>
+
+   <button id = "dropbt">DROP THE COURSE FROM SCHEDULE</button>
+
    <p id="message"></p>
 <script>
   function drawSchedule(classes){
@@ -175,9 +183,38 @@
             }
         }   
   }
+
+  function drawSelectlist(classes){
+    const select = document.getElementById("drop");
+    select.textContent = "";
+    for( let i = 0 ; i < classes.length ; i++){
+        const option1 = document.createElement("option");
+        option1.value = i;
+        let text = "";
+        if(Number(classes[i]["day"]) == 0){
+            text = "MONDAY"
+        }
+        else if(Number(classes[i]["day"]) == 1){
+            text = "TUESDAY"
+        }
+        else if(Number(classes[i]["day"]) == 2){
+            text = "WEDNESDAY"
+        }
+        else if(Number(classes[i]["day"]) == 3){
+            text = "THURSDAY"
+        }
+        else if(Number(classes[i]["day"]) == 4){
+            text = "FRIDAY"
+        }
+        option1.textContent = text + " " + classes[i]["id"] + " " +  classes[i]["name"];
+        select.appendChild(option1);
+    }
+  }
   const btn = document.getElementById("loginBtn");
 
   const addcoursebutton = document.getElementById("addCourse");
+
+  const dropbutton = document.getElementById("dropbt")
 
   let usernamegenel = null;
   let passwordgenel = null;
@@ -201,6 +238,7 @@
         passwordgenel = null;
         classes = [];
         drawSchedule(classes);
+        drawSelectlist(classes);
     }
     else if(response.ok){
         const data = await response.json();  // status : Login başarılı , classes : array
@@ -210,6 +248,7 @@
         passwordgenel = password1;
         classes = data["classes"];
         drawSchedule(classes);
+        drawSelectlist(classes);
     }
   });
 
@@ -248,10 +287,46 @@
         document.getElementById("message").textContent = data;
         classes.push({ "id": cid, "name": cname, "hour": from, "day": day1, "duration": duration1 })
         drawSchedule(classes);
+        drawSelectlist(classes);
     }
     else{
         const detail = await response.json()
         document.getElementById("message").textContent = detail["detail"];
+    }
+  });
+
+  dropbutton.addEventListener("click" , async function() {
+    if(usernamegenel == null || passwordgenel == null){
+        document.getElementById("message").textContent = "First , you need to login or sign in to the system.";
+       return;
+    }
+    let class1 = document.getElementById("drop").value;
+    if(class1 == null){
+        return;
+    }
+    console.log(classes[class1]);
+
+    let cname = classes[class1]["name"];
+
+    const response = await fetch("/deleteclass" , {
+        method : "POST" ,
+        headers: {"Content-Type" : "application/json"},
+        body : JSON.stringify(
+            {
+                slot : {id : classes[class1]["id"] , name : classes[class1]["name"] , hour :  classes[class1]["hour"] , day :  classes[class1]["day"] , duration :  classes[class1]["duration"]},
+                user : {username : usernamegenel , password : passwordgenel}
+                
+            })
+    });
+    if(response.status == 404){
+        document.getElementById("message").textContent = "öyle bir dersin yok";
+
+    }
+    else if(response.ok){
+        document.getElementById("message").textContent = cname + " adlı ders silindi";
+        classes.splice( Number(class1) , 1);
+        drawSchedule(classes);
+        drawSelectlist(classes);
     }
   });
 </script>
