@@ -5,8 +5,7 @@ import json
 import os
 from dotenv import load_dotenv
 import bcrypt
-import math
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse,FileResponse
 from enum import Enum
 
 
@@ -65,8 +64,10 @@ class Users(BaseModel):
     
 @app.get("/")
 def anasayfa():
-    cevap = client.admin.command("ping")
-    return cevap
+    # cevap = client.admin.command("ping")
+    # return cevap
+    return FileResponse("./public/index.html")
+    
 
 @app.post("/register")
 def register(user : Users):
@@ -79,7 +80,7 @@ def register(user : Users):
         if(check):
             return {"status" : "Succesfull login." , "classes" : tempuser["classes"]}
         else:
-            return HTMLResponse("yanlış şifre " , 401)
+            raise HTTPException(status_code = 401 , detail = "Wrong password")
     hashed_password = bcrypt.hashpw(password_to_bytes , salt)
     users.insert_one({"username" : username , "password" : hashed_password , "classes" : []})
     return {"status" : "Succesfully registered to the system." , "classes" : []} # yeni kullanıcı zaten dersi olmadığı için boş liste dönecek
@@ -102,7 +103,7 @@ def checkslot(user : dict , slot : slotforclass):
     rhour = slot.hour
     rduration = slot.duration
     ders_programi = [[0]*9 for i in range(0,5)]
-    classes = (users.find_one({"username" : user["username"]}))["classes"]
+    classes = user["classes"]
     #classes bir list ama dictlerden oluşuyor :
     #[
     #   {

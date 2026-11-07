@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ders Programı</title>
+  </head>
+  <body>
+   <table id = "schedule" border = "2">
+        <tr>
+            <th></th>
+            <th>MONDAY</th>
+            <th>TUESDAY</th>
+            <th>WEDNESDAY</th>
+            <th>THURSDAY</th>
+            <th>FRIDAY</th>
+        </tr>
+        <tr>
+            <th>8:40 - 9:30</th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>9:40 - 10:30</th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>10:40 - 11:30</th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>11:40 - 12:30</th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>12:40 - 13:30</th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>13:40 - 14:30</th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>14:40 - 15:30</th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>15:40 - 16:30</th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>16:40 - 17:30</th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+
+
+   </table>
+
+   <label>
+    Username
+   </label>
+   <input type="text" id="username">
+   <label>
+    Password
+   </label>
+   <input type="password" id="password">
+
+   <button id = "loginBtn">LOG IN / SIGN IN</button>
+
+
+
+   <label>
+    COURSE ID
+   </label>
+   <input type="text" id="cid">
+
+   <label>
+    Course Name
+   </label>
+   <input type="text" id="cname">
+
+   <label>
+       DAY
+   </label>
+   <select id = "day">
+        <option value = "0">MON</option>
+        <option value = "1">TUE</option>
+        <option value = "2">WED</option>
+        <option value = "3">THU</option>
+        <option value = "4">FRI</option>
+   </select>
+   
+   <label>
+       FROM
+   </label>
+   <select id = "from">
+        <option value = "0">8:40</option>
+        <option value = "1">9:40</option>
+        <option value = "2">10:40</option>
+        <option value = "3">11:40</option>
+        <option value = "4">12:40</option>
+        <option value = "5">13:40</option>
+        <option value = "6">14:40</option>
+        <option value = "7">15:40</option>
+        <option value = "8">16:40</option>
+   </select>
+
+   <label>
+       TO
+   </label>
+   <select id = "to">
+        <option value = "1">9:30</option>
+        <option value = "2">10:30</option>
+        <option value = "3">11:30</option>
+        <option value = "4">12:30</option>
+        <option value = "5">13:30</option>
+        <option value = "6">14:30</option>
+        <option value = "7">15:30</option>
+        <option value = "8">16:30</option>
+        <option value = "9">17:30</option>
+   </select>
+
+
+   <button id = "addCourse">ADD COURSE</button>
+
+   <p id="message"></p>
+<script>
+  function drawSchedule(classes){
+    const table = document.getElementById("schedule");
+    for(let i = 1 ; i < 10 ; i++){
+        for(let j = 1 ; j < 6 ; j++){
+            let cell = table.rows[i].cells[j];
+            cell.textContent = "";
+        }
+    }
+    for(let i = 0 ; i < classes.length ; i++){
+            let lecture = classes[i];
+            let duration = lecture["duration"]
+            for(let j = 0 ; j < duration ; j++){
+                let cell = table.rows[lecture["hour"] + 1 + j].cells[lecture["day"]+1];
+                cell.textContent = lecture["id"]+"-"+lecture["name"];
+            }
+        }   
+  }
+  const btn = document.getElementById("loginBtn");
+
+  const addcoursebutton = document.getElementById("addCourse");
+
+  let usernamegenel = null;
+  let passwordgenel = null;
+
+  let classes = null;
+
+
+  btn.addEventListener("click", async function () {
+    const username1 = document.getElementById("username").value
+    const password1 = document.getElementById("password").value
+    const response = await fetch("/register",{
+        method: "POST",
+        headers: {"Content-Type" : "application/json"},
+        body: JSON.stringify( { username : username1 , password : password1})
+
+    });
+    
+    if(response.status == 401){
+        document.getElementById("message").textContent = "Yanlış şifre";
+        usernamegenel = null;
+        passwordgenel = null;
+        classes = [];
+        drawSchedule(classes);
+    }
+    else if(response.ok){
+        const data = await response.json();  // status : Login başarılı , classes : array
+        console.log(data);                    
+        document.getElementById("message").textContent = "giriş başarılı";
+        usernamegenel = username1;
+        passwordgenel = password1;
+        classes = data["classes"];
+        drawSchedule(classes);
+    }
+  });
+
+  addcoursebutton.addEventListener("click" , async function (){
+
+    if(usernamegenel == null || passwordgenel == null){
+        document.getElementById("message").textContent = "First , you need to login or sign in to the system.";
+       return;
+    }
+    let cid = document.getElementById("cid").value;
+    let cname = document.getElementById("cname").value;
+    let day1 = Number(document.getElementById("day").value);
+    let from = Number(document.getElementById("from").value);
+    let to = Number(document.getElementById("to").value);
+
+    let duration1 = to - from;
+    if(duration1 <= 0) {
+       document.getElementById("message").textContent = "GEÇMİŞE AKMIYOR ZAMAN";
+       return;
+    }
+    const response = await fetch("/addclass" , {
+        method : "POST" ,
+        headers: {"Content-Type" : "application/json"},
+        body :JSON.stringify(
+        {
+        slot: { id: cid, name: cname, hour: from, day: day1, duration: duration1 },
+        user: { username: usernamegenel, password: passwordgenel }
+        })
+
+    });
+    if(response.status == 409){
+        document.getElementById("message").textContent = "slot dolu imiş baksana lo";
+    }
+    else if(response.ok){
+        const data = await response.json();
+        document.getElementById("message").textContent = data;
+        classes.push({ "id": cid, "name": cname, "hour": from, "day": day1, "duration": duration1 })
+        drawSchedule(classes);
+    }
+    else{
+        const detail = await response.json()
+        document.getElementById("message").textContent = detail["detail"];
+    }
+  });
+</script>
+
+  </body>
+</html>
