@@ -428,11 +428,16 @@
         document.getElementById("message").textContent = "First , you need to log in or sign in to the system.";
        return;
     }
-    let cid = document.getElementById("cid").value;
-    let cname = document.getElementById("cname").value;
+    let cid = document.getElementById("cid").value.trim();
+    let cname = document.getElementById("cname").value.trim();
     let day1 = Number(document.getElementById("day").value);
     let from = Number(document.getElementById("from").value);
     let to = Number(document.getElementById("to").value);
+
+    if(cid == "" || cname == ""){
+        document.getElementById("message").textContent = "Please fill the id  and name block.";
+        return;
+    }
 
     let duration1 = to - from;
     if(duration1 <= 0) {

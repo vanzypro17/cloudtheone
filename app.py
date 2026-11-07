@@ -47,8 +47,8 @@ app = FastAPI()
 
 
 class slotforclass(BaseModel):
-    id : str
-    name : str
+    id : str = Field(min_length=1 , max_length=20)
+    name : str = Field(min_length=1 , max_length=20)
     hour : int = Field(ge = 0 , le=8)
     day : Days
     duration : int = Field(ge = 1 , le = 9)
