@@ -78,7 +78,7 @@ def register(user : Users):
     if(tempuser):
         check = bcrypt.checkpw(password_to_bytes , tempuser["password"])
         if(check):
-            return {"status" : "Succesfull login." , "classes" : tempuser["classes"]}
+            return {"status" : "Succesfully login." , "classes" : tempuser["classes"]}
         else:
             raise HTTPException(status_code = 401 , detail = "Wrong password")
     hashed_password = bcrypt.hashpw(password_to_bytes , salt)
@@ -94,9 +94,9 @@ def get_user(user : Users):
         if(is_valid):
             return temp
         else:
-            raise HTTPException(status_code = 401 , detail = "Wrong password")
+            raise HTTPException(status_code = 401 , detail = "Wrong password!")
         
-    raise HTTPException(status_code = 401 , detail = "USER NOT FOUND , first login")
+    raise HTTPException(status_code = 401 , detail = "USER NOT FOUND , please first login to the system.")
 
 def checkslot(user : dict , slot : slotforclass):
     rday = slot.day.value
@@ -150,13 +150,13 @@ def checkslot(user : dict , slot : slotforclass):
 @app.post("/addclass")
 def addclass(slot : slotforclass , user : dict = Depends(get_user)):
     if(slot.duration + slot.hour > 9):
-        raise HTTPException(status_code=422 , detail="Böyle bir ders yok")
+        raise HTTPException(status_code=422 , detail="It doesnt seem possibile to have a class like this :) ")
     is_free = checkslot(user , slot)
     if(is_free):
         users.update_one({"username" : user["username"]} , { "$push" : {"classes" : slot.model_dump(mode='json')}})
-        return "Başarı ile eklendi dostane kestanem"
+        return "Class is succesfully added to the schedule!"
     else:
-        raise HTTPException(status_code=409 , detail="Slot dolu cano")
+        raise HTTPException(status_code=409 , detail="Requested slots are not available on the schedule.")
 
 @app.post("/getclasses")
 def bring(user : dict = Depends(get_user)):
@@ -176,8 +176,8 @@ def bring(user : dict = Depends(get_user)):
 def deleteclass(slot : slotforclass , user : dict = Depends(get_user)):
     boom = users.update_one({"username" : user["username"]} , { "$pull" : {"classes" : slot.model_dump(mode='json')}})
     if(boom.modified_count):
-        return "başarıyla silindi"
-    raise HTTPException(status_code=404 , detail="Yok ki öyle bir dersin")
+        return "Class is succesfully removed from the schedule."
+    raise HTTPException(status_code=404 , detail="Something is wrong.")
     
 
 

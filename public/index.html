@@ -403,7 +403,7 @@
     });
     
     if(response.status == 401){
-        document.getElementById("message").textContent = "Yanlış şifre";
+        document.getElementById("message").textContent = "Wrong password.";
         usernamegenel = null;
         passwordgenel = null;
         classes = [];
@@ -413,7 +413,7 @@
     else if(response.ok){
         const data = await response.json();  // status : Login başarılı , classes : array
         console.log(data);                    
-        document.getElementById("message").textContent = "giriş başarılı";
+        document.getElementById("message").textContent = "Succesfully registered / Succesfull login.";
         usernamegenel = username1;
         passwordgenel = password1;
         classes = data["classes"];
@@ -425,7 +425,7 @@
   addcoursebutton.addEventListener("click" , async function (){
 
     if(usernamegenel == null || passwordgenel == null){
-        document.getElementById("message").textContent = "First , you need to login or sign in to the system.";
+        document.getElementById("message").textContent = "First , you need to log in or sign in to the system.";
        return;
     }
     let cid = document.getElementById("cid").value;
@@ -436,7 +436,7 @@
 
     let duration1 = to - from;
     if(duration1 <= 0) {
-       document.getElementById("message").textContent = "GEÇMİŞE AKMIYOR ZAMAN";
+       document.getElementById("message").textContent = "Time slots seem wrong to me.";
        return;
     }
     const response = await fetch("/addclass" , {
@@ -450,14 +450,16 @@
 
     });
     if(response.status == 409){
-        document.getElementById("message").textContent = "slot dolu imiş baksana lo";
+        document.getElementById("message").textContent = "Requested slots are not available , there is conflict.";
     }
     else if(response.ok){
         const data = await response.json();
         document.getElementById("message").textContent = data;
         classes.push({ "id": cid, "name": cname, "hour": from, "day": day1, "duration": duration1 })
+
         drawSchedule(classes);
         drawSelectlist(classes);
+        
     }
     else{
         const detail = await response.json()
@@ -505,11 +507,11 @@
             })
     });
     if(response.status == 404){
-        document.getElementById("message").textContent = "öyle bir dersin yok";
+        document.getElementById("message").textContent = "That course could not be found.";
 
     }
     else if(response.ok){
-        document.getElementById("message").textContent = text + " gününde olan "+ cname + " adlı ders silindi";
+        document.getElementById("message").textContent = "The course " + cname + " on " + text + " has been deleted.";
         classes.splice( Number(class1) , 1);
         drawSchedule(classes);
         drawSelectlist(classes);
